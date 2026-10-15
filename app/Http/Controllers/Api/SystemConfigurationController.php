@@ -20,6 +20,16 @@ class SystemConfigurationController extends Controller
     }
 
     /**
+     * Return public system branding (app name, company name, logo, theme).
+     */
+    public function branding(): JsonResponse
+    {
+        return response()->json([
+            'data' => $this->configuration(),
+        ]);
+    }
+
+    /**
      * Update the submitted system configuration fields.
      */
     public function update(UpdateSystemConfigurationRequest $request): JsonResponse

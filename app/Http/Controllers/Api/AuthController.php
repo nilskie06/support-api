@@ -54,7 +54,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'token' => $token,
-            'user' => $user,
+            'user' => $user->load(['assignments', 'menuAccess']),
         ]);
     }
 
@@ -101,8 +101,91 @@ class AuthController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
+        $user = $request->user();
+        if ($user) {
+            $user->load(['assignments', 'menuAccess']);
+        }
+
         return response()->json([
-            'user' => $request->user(),
+            'user' => $user,
+        ]);
+    }
+
+    /** Update the authenticated user's account details. */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'fullname' => ['required', 'string', 'max:255'],
+            'username' => ['nullable', 'string', 'max:255', 'unique:users,username,'.$user->id],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
+        ]);
+
+        $user->fill([
+            'fullname' => $validated['fullname'],
+            'name' => $validated['fullname'],
+            'username' => $validated['username'] ?: null,
+            'email' => $validated['email'],
+        ])->save();
+
+        return response()->json(['data' => $user->fresh(['assignments', 'menuAccess'])]);
+    }
+
+    /** Verify the active user's password before unlocking the application. */
+    public function unlock(Request $request): JsonResponse
+    {
+        $validated = $request->validate(['password' => ['required', 'string']]);
+
+        if (! Hash::check($validated['password'], $request->user()->password)) {
+            throw ValidationException::withMessages(['password' => ['The password is incorrect.']]);
+        }
+
+        return response()->json(['message' => 'Screen unlocked.']);
+    }
+
+    /**
+     * Return the authenticated user's UI customizer preferences.
+     */
+    public function getPreferences(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'data' => [
+                'theme_config' => $user->theme_config,
+                'layout_config' => $user->layout_config,
+            ],
+        ]);
+    }
+
+    /**
+     * Update the authenticated user's UI customizer preferences.
+     */
+    public function updatePreferences(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'theme_config' => ['nullable', 'array'],
+            'layout_config' => ['nullable', 'array'],
+        ]);
+
+        $user = $request->user();
+
+        if ($request->has('theme_config')) {
+            $user->theme_config = $validated['theme_config'];
+        }
+
+        if ($request->has('layout_config')) {
+            $user->layout_config = $validated['layout_config'];
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'User preferences updated successfully',
+            'data' => [
+                'theme_config' => $user->theme_config,
+                'layout_config' => $user->layout_config,
+            ],
         ]);
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable([
     'configuration_key',
     'app_name',
+    'system_logo',
     'company_name',
     'support_email',
     'hotline',
@@ -28,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
     'checkbox_radius',
     'checkbox_size',
     'checkbox_border_width',
+    'layout_config',
 ])]
 class SystemConfiguration extends Model
 {
@@ -56,6 +58,7 @@ class SystemConfiguration extends Model
     {
         return [
             'maintenance_mode' => 'boolean',
+            'layout_config' => 'array',
         ];
     }
 }

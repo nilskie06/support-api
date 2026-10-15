@@ -8,133 +8,62 @@ use Illuminate\Database\Seeder;
 class MenuSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Seed the current menu structure. This seeder intentionally leaves an
+     * existing menu table untouched; it is a baseline for fresh databases.
      */
     public function run(): void
     {
-        if (Menu::count() > 0) {
+        if (Menu::query()->exists()) {
             return;
         }
 
-        $dashboard = Menu::create([
-            'parent_id' => 0,
-            'name' => 'Dashboard',
-            'code' => 'dashboard',
-            'icon' => 'ri-dashboard-2-line',
-            'url' => '/',
-            'order' => 1,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
+        $roots = [
+            ['name' => 'Dashboard', 'code' => 'dashboard', 'icon' => 'ri-dashboard-2-line', 'url' => '/dashboard/analytics', 'order' => 0],
+            ['name' => 'Kanban Board', 'code' => 'ticket_kanban', 'icon' => 'ri-artboard-2-line', 'url' => '/kanban?board=system', 'order' => 1],
+            ['name' => 'New', 'code' => 'tickets', 'icon' => 'ri-ticket-2-line', 'url' => '/tickets/new', 'order' => 2],
+            ['name' => 'Ticket List', 'code' => 'ticket_list', 'icon' => 'ri-list-check', 'url' => '/tickets/list', 'order' => 3],
+            ['name' => 'Chat', 'code' => 'chat', 'icon' => 'ri-chat-3-line', 'url' => '/chat', 'order' => 4],
+            ['name' => 'Reports', 'code' => 'reports', 'icon' => 'ri-file-chart-line', 'url' => null, 'order' => 5],
+            ['name' => 'Settings', 'code' => 'settings', 'icon' => 'ri-settings-4-line', 'url' => '#', 'order' => 6],
+        ];
 
-        Menu::create([
-            'parent_id' => $dashboard->id,
-            'name' => 'Analytics',
-            'code' => 'dashboard_analytics',
-            'icon' => 'ri-bar-chart-2-line',
-            'url' => '/dashboard/analytics',
-            'order' => 1,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
+        $menuIds = [];
+        foreach ($roots as $menu) {
+            $menuIds[$menu['code']] = Menu::create([
+                ...$menu,
+                'parent_id' => 0,
+                'status' => true,
+                'is_side_menu' => true,
+            ])->id;
+        }
 
-        Menu::create([
-            'parent_id' => $dashboard->id,
-            'name' => 'CRM',
-            'code' => 'dashboard_crm',
-            'icon' => 'ri-customer-service-2-line',
-            'url' => '/dashboard/crm',
-            'order' => 2,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
+        $children = [
+            ['parent' => 'reports', 'name' => 'General Report', 'code' => 'general-reports', 'icon' => 'ri-file-chart-line', 'url' => '/reports/general-report', 'order' => 0],
+            ['parent' => 'settings', 'name' => 'Menus', 'code' => 'menu_management', 'icon' => 'ri-menu-2-line', 'url' => '/menu', 'order' => 0],
+            ['parent' => 'settings', 'name' => 'System Config', 'code' => 'system_configuration', 'icon' => 'ri-tools-line', 'url' => '/system-configuration', 'order' => 1],
+            ['parent' => 'settings', 'name' => 'Category', 'code' => 'settings_board', 'icon' => 'ri-artboard-line', 'url' => '/settings/board', 'order' => 2],
+            ['parent' => 'settings', 'name' => 'Issue Types', 'code' => 'settings_issue_type', 'icon' => 'ri-price-tag-3-line', 'url' => '/settings/issue-type', 'order' => 3],
+            ['parent' => 'settings', 'name' => 'Ticket Types', 'code' => 'settings_type', 'icon' => 'ri-price-tag-line', 'url' => '/settings/type', 'order' => 4],
+            ['parent' => 'settings', 'name' => 'Companies', 'code' => 'company-settings', 'icon' => 'ri-building-line', 'url' => '/settings/company', 'order' => 5],
+            ['parent' => 'settings', 'name' => 'Severities', 'code' => 'settings_severities', 'icon' => 'ri-shield-star-line', 'url' => '/settings/severities', 'order' => 6],
+            ['parent' => 'settings', 'name' => 'Systems', 'code' => 'system-settings', 'icon' => 'ri-computer-line', 'url' => '/settings/system', 'order' => 7],
+            ['parent' => 'settings', 'name' => 'Departments', 'code' => 'department-settings', 'icon' => 'ri-community-line', 'url' => '/settings/department', 'order' => 8],
+            ['parent' => 'settings', 'name' => 'Stations', 'code' => 'station-settings', 'icon' => 'ri-map-pin-range-line', 'url' => '/settings/station', 'order' => 9],
+            ['parent' => 'settings', 'name' => 'Users', 'code' => 'user-settings', 'icon' => 'ri-user-settings-line', 'url' => '/settings/users', 'order' => 10],
+            ['parent' => 'settings', 'name' => 'Roles', 'code' => 'role-settings', 'icon' => 'ri-shield-user-line', 'url' => '/settings/roles', 'order' => 11],
+            ['parent' => 'settings', 'name' => 'Permissions', 'code' => 'permission-settings', 'icon' => 'ri-key-2-line', 'url' => '/settings/permissions', 'order' => 12],
+            ['parent' => 'settings', 'name' => 'Team', 'code' => 'team', 'icon' => 'ri-team-line', 'url' => '/settings/team', 'order' => 13],
+        ];
 
-        $tickets = Menu::create([
-            'parent_id' => 0,
-            'name' => 'Tickets',
-            'code' => 'tickets',
-            'icon' => 'ri-ticket-2-line',
-            'url' => '/tickets/list',
-            'order' => 2,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        Menu::create([
-            'parent_id' => $tickets->id,
-            'name' => 'Ticket List',
-            'code' => 'ticket_list',
-            'icon' => 'ri-list-check',
-            'url' => '/tickets/list',
-            'order' => 1,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        Menu::create([
-            'parent_id' => 0,
-            'name' => 'Menu Management',
-            'code' => 'menu_management',
-            'icon' => 'ri-menu-2-line',
-            'url' => '/menu',
-            'order' => 3,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        $settings = Menu::create([
-            'parent_id' => 0,
-            'name' => 'Settings',
-            'code' => 'settings',
-            'icon' => 'ri-settings-4-line',
-            'url' => '#',
-            'order' => 4,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        Menu::create([
-            'parent_id' => $settings->id,
-            'name' => 'General',
-            'code' => 'settings_general',
-            'icon' => 'ri-toggle-line',
-            'url' => '/pages/profile/setting',
-            'order' => 1,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        Menu::create([
-            'parent_id' => $settings->id,
-            'name' => 'System Configuration',
-            'code' => 'system_configuration',
-            'icon' => 'ri-tools-line',
-            'url' => '/system-configuration',
-            'order' => 2,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        $security = Menu::create([
-            'parent_id' => $settings->id,
-            'name' => 'Security',
-            'code' => 'settings_security',
-            'icon' => 'ri-shield-keyhole-line',
-            'url' => '#',
-            'order' => 2,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
-
-        Menu::create([
-            'parent_id' => $security->id,
-            'name' => 'Two-Factor Auth',
-            'code' => 'security_2fa',
-            'icon' => 'ri-lock-password-line',
-            'url' => '/settings/security/2fa',
-            'order' => 1,
-            'status' => true,
-            'is_side_menu' => true,
-        ]);
+        foreach ($children as $menu) {
+            $parentCode = $menu['parent'];
+            unset($menu['parent']);
+            Menu::create([
+                ...$menu,
+                'parent_id' => $menuIds[$parentCode],
+                'status' => true,
+                'is_side_menu' => true,
+            ]);
+        }
     }
 }

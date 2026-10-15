@@ -78,4 +78,12 @@ class Menu extends Model
             $q->whereNull('parent_id')->orWhere('parent_id', 0);
         })->orderBy('order');
     }
+
+    /**
+     * User access entries for this menu.
+     */
+    public function userAccess(): HasMany
+    {
+        return $this->hasMany(UserMenuAcces::class, 'menu_id');
+    }
 }

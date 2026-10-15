@@ -25,6 +25,7 @@ class UpdateSystemConfigurationRequest extends FormRequest
     {
         return [
             'app_name' => ['sometimes', 'required', 'string', 'max:255'],
+            'system_logo' => ['sometimes', 'nullable', 'string'],
             'company_name' => ['sometimes', 'required', 'string', 'max:255'],
             'support_email' => ['sometimes', 'required', 'email', 'max:255'],
             'hotline' => ['sometimes', 'required', 'string', 'max:50'],
@@ -64,6 +65,18 @@ class UpdateSystemConfigurationRequest extends FormRequest
             'checkbox_radius' => ['sometimes', 'required', Rule::in(['square', 'subtle', 'circle'])],
             'checkbox_size' => ['sometimes', 'required', Rule::in(['compact', 'default', 'large'])],
             'checkbox_border_width' => ['sometimes', 'required', Rule::in(['1px', '1.5px', '2px'])],
+            'layout_config' => ['sometimes', 'nullable', 'array'],
+            'layout_config.layoutType' => ['nullable', Rule::in(['vertical', 'horizontal', 'twocolumn', 'semibox'])],
+            'layout_config.layoutWidth' => ['nullable', Rule::in(['fluid', 'boxed'])],
+            'layout_config.sidebarSize' => ['nullable', 'string', 'max:30'],
+            'layout_config.topbar' => ['nullable', Rule::in(['light', 'dark'])],
+            'layout_config.mode' => ['nullable', Rule::in(['light', 'dark'])],
+            'layout_config.position' => ['nullable', Rule::in(['fixed', 'scrollable'])],
+            'layout_config.sidebarView' => ['nullable', 'string', 'max:30'],
+            'layout_config.sidebarColor' => ['nullable', 'string', 'max:30'],
+            'layout_config.sidebarImage' => ['nullable', 'string', 'max:30'],
+            'layout_config.preloader' => ['nullable', Rule::in(['enable', 'disable'])],
+            'layout_config.visibility' => ['nullable', 'string', 'max:30'],
         ];
     }
 }

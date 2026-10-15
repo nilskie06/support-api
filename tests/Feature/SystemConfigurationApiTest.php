@@ -114,6 +114,25 @@ class SystemConfigurationApiTest extends TestCase
         $this->assertDatabaseCount('tkt_system_configurations', 0);
     }
 
+    public function test_authenticated_user_can_update_system_logo(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $dataUriLogo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        $response = $this->putJson('/api/system-configuration', [
+            'system_logo' => $dataUriLogo,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.system_logo', $dataUriLogo);
+
+        $this->assertDatabaseHas('tkt_system_configurations', [
+            'configuration_key' => 'default',
+            'system_logo' => $dataUriLogo,
+        ]);
+    }
+
     /**
      * @return array<string, bool|string>
      */
